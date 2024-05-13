@@ -1,8 +1,8 @@
 const { ethers, network } = require(`hardhat`);
 
-const firstReceiver = '0x965F527D9159dCe6288a2219DB51fc6Eef120dD1'
-const secondReceiver = '0x965F527D9159dCe6288a2219DB51fc6Eef120dD1'
-const thirdReceiver = '0x965F527D9159dCe6288a2219DB51fc6Eef120dD1'
+const firstReceiver = ''
+const secondReceiver = ''
+const thirdReceiver = ''
 
 const deployParams = [firstReceiver, secondReceiver, thirdReceiver]
 

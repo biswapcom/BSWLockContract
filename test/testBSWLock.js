@@ -74,7 +74,7 @@ describe('Lock tokens', async () => {
                     firstReceiverFixedAmount,
                     partAmount.sub(firstReceiverFixedAmount).div(2),
                     partAmount.sub(firstReceiverFixedAmount).div(2),
-                    firstReceiverFixedAmount.add(partAmount.sub(firstReceiverFixedAmount)).mul(-1)
+                    partAmount.mul(-1)
                 ]
             )
     });
@@ -89,7 +89,7 @@ describe('Lock tokens', async () => {
                     firstReceiverFixedAmount.mul(2),
                     partAmount.mul(2).sub(firstReceiverFixedAmount.mul(2)).div(2),
                     partAmount.mul(2).sub(firstReceiverFixedAmount.mul(2)).div(2),
-                    firstReceiverFixedAmount.mul(2).add(partAmount.mul(2).sub(firstReceiverFixedAmount.mul(2))).mul(-1)
+                    partAmount.mul(2).mul(-1)
                 ]
             )
     });
@@ -109,7 +109,7 @@ describe('Lock tokens', async () => {
                     firstReceiverFixedAmount,
                     partAmount.sub(firstReceiverFixedAmount).div(2),
                     partAmount.sub(firstReceiverFixedAmount).div(2),
-                    firstReceiverFixedAmount.add(partAmount.sub(firstReceiverFixedAmount)).mul(-1)
+                    partAmount.mul(-1)
                 ]
             )
     });
@@ -129,7 +129,7 @@ describe('Lock tokens', async () => {
                     firstReceiverFixedAmount,
                     partAmount.sub(firstReceiverFixedAmount).div(2),
                     partAmount.sub(firstReceiverFixedAmount).div(2),
-                    firstReceiverFixedAmount.add(partAmount.sub(firstReceiverFixedAmount)).mul(-1).add(1)
+                    partAmount.mul(-1).add(1)
                 ]
             )
     });
@@ -146,7 +146,7 @@ describe('Lock tokens', async () => {
                     firstReceiverFixedAmount.mul(5),
                     partAmount.mul(31).sub(firstReceiverFixedAmount.mul(5)).div(2),
                     partAmount.mul(31).sub(firstReceiverFixedAmount.mul(5)).div(2),
-                    firstReceiverFixedAmount.mul(5).add(partAmount.mul(31).sub(firstReceiverFixedAmount.mul(5))).mul(-1).add(1)
+                    partAmount.mul(31).mul(-1).add(1)
                 ]
             )
     });

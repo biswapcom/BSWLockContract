@@ -18,8 +18,6 @@ contract BSWLock is Ownable {
     uint public constant firstReceiverFixedAmount = 1e6 ether;
     /// @notice how many periods the first recipient will accept the tokens
     uint public firstReceiverPartsLeft = 10;
-    /// @notice unlock tokens amount for each period
-    uint public partAmount;
     /// @notice timestamp when lock period started
     uint public lockTimestamp;
     /// @notice how many parts have been withdrawn
@@ -70,8 +68,7 @@ contract BSWLock is Ownable {
         }
         require(lockTimestamp + partDuration > block.timestamp, "Lock: Cant lock tokens after first period ended");
         bsw.transferFrom(msg.sender, address(this), amount);
-        partAmount = bsw.balanceOf(address(this)) / totalParts;
-        require(partAmount >= firstReceiverFixedAmount, "Lock: Low amount");
+        require(bsw.balanceOf(address(this)) >= firstReceiverFixedAmount * totalParts, "Lock: Low amount");
         emit LockTokens(amount);
     }
 
@@ -79,7 +76,7 @@ contract BSWLock is Ownable {
     function withdraw() external {
         require(lockTimestamp > 0, "Withdraw: Not locked yet");
         require(withdrawnParts < totalParts,"Withdraw: All parts withdrawn");
-        partAmount = bsw.balanceOf(address(this))/(totalParts - withdrawnParts);
+        uint partAmount = bsw.balanceOf(address(this))/(totalParts - withdrawnParts);
         uint partsCount = (block.timestamp - lockTimestamp) / partDuration;
         require(partsCount > withdrawnParts, "Withdraw: lock period is not over yet");
         uint partsToWithdraw = partsCount < totalParts ? partsCount - withdrawnParts : totalParts - withdrawnParts;
@@ -92,17 +89,22 @@ contract BSWLock is Ownable {
         if(_firstReceiverWithdrawAmount > 0){
             bsw.transfer(firstReceiver, _firstReceiverWithdrawAmount);
         }
-        uint amount = (partsToWithdraw * partAmount - _firstReceiverWithdrawAmount)/2;
-        bsw.transfer(secondReceiver, amount);
-        bsw.transfer(thirdReceiver, amount);
+        uint amount = (partsToWithdraw * partAmount - _firstReceiverWithdrawAmount);
+        bsw.transfer(secondReceiver, amount/2);
+        bsw.transfer(thirdReceiver, amount/2);
 
-        emit WithdrawTokens(_firstReceiverWithdrawAmount + amount + amount);
+        emit WithdrawTokens(_firstReceiverWithdrawAmount + amount);
+    }
+
+    /// @notice returns the amount of tokens for each part still available to be withdrawn
+    function partAmount() public view returns(uint){
+        return bsw.balanceOf(address(this))/(totalParts - withdrawnParts);
     }
 
     /// @notice final withdraw tokens when end lock period and all vesting periods
     /// @param token ERC20 token contract for withdraw
     function finalWithdraw(IERC20 token) external {
-        require(block.timestamp >= lockTimestamp + totalParts * partDuration, "finalWithdraw: All periods have not yet passed");
+        if(token == bsw) require(block.timestamp >= lockTimestamp + totalParts * partDuration, "finalWithdraw: All periods have not yet passed");
         uint amount = token.balanceOf(address(this));
         token.transfer(secondReceiver, amount);
         emit WithdrawTokens(amount);

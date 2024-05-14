@@ -18,8 +18,6 @@ contract BSWLock is Ownable {
     uint public constant firstReceiverFixedAmount = 1e6 ether;
     /// @notice how many periods the first recipient will accept the tokens
     uint public firstReceiverPartsLeft = 10;
-    /// @notice tokens locked amount
-    uint public lockedAmount;
     /// @notice unlock tokens amount for each period
     uint public partAmount;
     /// @notice timestamp when lock period started
@@ -37,8 +35,8 @@ contract BSWLock is Ownable {
     /// @param amount amount locked tokens
     event LockTokens(uint amount);
     /// @notice emit when withdraw tokens
-    /// @param  partsToWithdraw how many parts withdrawn
-    event WithdrawTokens(uint partsToWithdraw);
+    /// @param  amount how many tokens withdrawn
+    event WithdrawTokens(uint amount);
     /// @notice emit when receivers changed
     event SetTokenReceivers(address _firstReceiver, address _secondReceiver, address _thirdReceiver);
 
@@ -52,9 +50,9 @@ contract BSWLock is Ownable {
 
    /// @notice Sets the token receivers for the contract
    /// The function replaces the current token receivers with the ones provided in the arguments
-   /// @param _firstReceiver - Wallet address for initial token receiver
-   /// @param _secondReceiver - Wallet address for secondary receiver
-   /// @param _thirdReceiver - Wallet address for third receiver
+   /// @param _firstReceiver Wallet address for initial token receiver
+   /// @param _secondReceiver Wallet address for secondary receiver
+   /// @param _thirdReceiver Wallet address for third receiver
    /// @dev Function can be called only by the contract owner
     function setTokenReceivers(address _firstReceiver, address _secondReceiver, address _thirdReceiver) public onlyOwner {
         require(_firstReceiver != address(0) && _secondReceiver != address(0) && _thirdReceiver != address(0), "Receiver addresses can't be zero");
@@ -72,8 +70,7 @@ contract BSWLock is Ownable {
         }
         require(lockTimestamp + partDuration > block.timestamp, "Lock: Cant lock tokens after first period ended");
         bsw.transferFrom(msg.sender, address(this), amount);
-        lockedAmount += amount;
-        partAmount = lockedAmount / totalParts;
+        partAmount = bsw.balanceOf(address(this)) / totalParts;
         require(partAmount >= firstReceiverFixedAmount, "Lock: Low amount");
         emit LockTokens(amount);
     }
@@ -82,12 +79,11 @@ contract BSWLock is Ownable {
     function withdraw() external {
         require(lockTimestamp > 0, "Withdraw: Not locked yet");
         require(withdrawnParts < totalParts,"Withdraw: All parts withdrawn");
-        require(block.timestamp >= lockTimestamp + (withdrawnParts * partDuration), "Withdraw: Tokens are not unlocked yet");
         partAmount = bsw.balanceOf(address(this))/(totalParts - withdrawnParts);
         uint partsCount = (block.timestamp - lockTimestamp) / partDuration;
         require(partsCount > withdrawnParts, "Withdraw: lock period is not over yet");
-        uint partsToWithdraw = partsCount - withdrawnParts + withdrawnParts < totalParts ? partsCount - withdrawnParts : totalParts - withdrawnParts;
-        withdrawnParts = partsCount;
+        uint partsToWithdraw = partsCount < totalParts ? partsCount - withdrawnParts : totalParts - withdrawnParts;
+        withdrawnParts = partsCount > totalParts ? totalParts : partsCount;
         uint _firstReceiverPartsToWithdraw = firstReceiverPartsLeft >= partsToWithdraw ?
             partsToWithdraw :
             firstReceiverPartsLeft;
@@ -100,15 +96,15 @@ contract BSWLock is Ownable {
         bsw.transfer(secondReceiver, amount);
         bsw.transfer(thirdReceiver, amount);
 
-        emit WithdrawTokens(partsToWithdraw);
+        emit WithdrawTokens(_firstReceiverWithdrawAmount + amount + amount);
     }
 
     /// @notice final withdraw tokens when end lock period and all vesting periods
     /// @param token ERC20 token contract for withdraw
     function finalWithdraw(IERC20 token) external {
         require(block.timestamp >= lockTimestamp + totalParts * partDuration, "finalWithdraw: All periods have not yet passed");
-        uint amount = bsw.balanceOf(address(this));
+        uint amount = token.balanceOf(address(this));
         token.transfer(secondReceiver, amount);
-        emit WithdrawTokens(totalParts);
+        emit WithdrawTokens(amount);
     }
 }

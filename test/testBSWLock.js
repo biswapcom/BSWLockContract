@@ -58,7 +58,6 @@ describe('Lock tokens', async () => {
 
         await expect(bswLockContract.connect(owner).lock(lockAmount))
             .changeTokenBalances(bsw, [owner, bswLockContract], [lockAmount.mul(-1), lockAmount]);
-        expect(await bswLockContract.lockedAmount()).to.equal(lockAmount)
     });
     it("Check withdraw tokens before lock period end", async function () {
         await passTime(partDuration.div(2).toString())

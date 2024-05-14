@@ -5,7 +5,7 @@ import "./IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-/// @title Contract to lock dev team BFG tokens
+/// @title Contract to lock dev team BSW tokens
 contract BSWLock is Ownable {
 
     /// @notice BSW token ERC20 interface

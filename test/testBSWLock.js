@@ -36,7 +36,7 @@ let BSWLockContract, bswLockContract, owner, firstRecever, secondReceiver, third
 before(async () => {
     BSWLockContract = await ethers.getContractFactory('BSWLock');
     [owner, firstRecever, secondReceiver, thirdReceiver, account] = await ethers.getSigners();
-    bswLockContract = await BSWLockContract.deploy(owner.address, firstRecever.address, secondReceiver.address, thirdReceiver.address);
+    bswLockContract = await BSWLockContract.deploy(account.address, firstRecever.address, secondReceiver.address, thirdReceiver.address);
     bsw = new ethers.Contract('0x965F527D9159dCe6288a2219DB51fc6Eef120dD1', ERC20ABI, owner);
     totalParts = await bswLockContract.totalParts();
     partDuration = await bswLockContract.partDuration();
@@ -45,6 +45,10 @@ before(async () => {
 });
 
 describe('Lock tokens', async () => {
+
+    it("Check ownership", async () => {
+        expect(await bswLockContract.owner()).eq(account.address)
+    });
 
     it("Get tokens", async () => {
         let amount = toBN(60000000);

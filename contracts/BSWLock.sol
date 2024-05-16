@@ -42,7 +42,7 @@ contract BSWLock is Ownable {
     /// @param _firstReceiver Address of the first token receiver
     /// @param _secondReceiver Address of the second token receiver
     /// @param _thirdReceiver Address of the third token receiver
-    constructor(address _firstReceiver, address _secondReceiver, address _thirdReceiver) Ownable(msg.sender) {
+    constructor(address _owner, address _firstReceiver, address _secondReceiver, address _thirdReceiver) Ownable(_owner) {
         setTokenReceivers(_firstReceiver, _secondReceiver, _thirdReceiver);
     }
 

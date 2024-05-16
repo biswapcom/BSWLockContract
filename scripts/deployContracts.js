@@ -3,8 +3,9 @@ const { ethers, network } = require(`hardhat`);
 const firstReceiver = ''
 const secondReceiver = ''
 const thirdReceiver = ''
+const owner = '0x39A6C7216E1406bA1771868b63Ccb2c3bBe183E5'
 
-const deployParams = [firstReceiver, secondReceiver, thirdReceiver]
+const deployParams = [owner, firstReceiver, secondReceiver, thirdReceiver]
 
 const main = async () => {
     let accounts = await ethers.getSigners()

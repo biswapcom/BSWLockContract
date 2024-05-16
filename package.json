@@ -17,7 +17,7 @@
     "hardhat-docgen": "^0.0.0",
     "hardhat-gas-reporter": "^1.0.9",
     "mocha": "^10.2.0",
-    "web3": "^4.6.0"
+    "web3": "^4.6.1"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2",
